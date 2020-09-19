@@ -666,9 +666,12 @@ class QRegex::P6Regex::Actions is HLL::Actions {
     }
 
     method cclass_elem($/) {
+        note("n1");
+        note($/);
         my $str := '';
         my $qast;
         if $<name> {
+            note("n2");
             my $name := ~$<name>;
             $qast := QAST::Regex.new( :rxtype<subrule>, :subtype<method>,
                                       :negate( $<sign> eq '-' ), :node($/),
@@ -676,11 +679,16 @@ class QRegex::P6Regex::Actions is HLL::Actions {
         }
         # <:Letter>
         elsif $<identifier> {
+            note("in :Letter branch");
+            note('identifier: ' ~ $<identifier>);
+            note('key: ' ~ $*key);
             $qast := QAST::Regex.new( $*key, :rxtype<uniprop>,
                                       :negate( $<sign> eq '-' && $<invert> ne '!' # $<sign> ^^ $<invert>
                                         || $<sign> ne '-' && $<invert> eq '!' ), :node($/) );
 
             # <:NumericValue(0 ^..^ 1)>
+            note('coloncircumfix: ' ~ $<coloncircumfix>);
+            # note('got True') if $<coloncircumfix>;
             $qast.push($<coloncircumfix>.ast) if $<coloncircumfix>;
         }
         else {
